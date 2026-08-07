@@ -121,7 +121,7 @@ if (fs.existsSync(dist)) {
 // In dev ("node server/index.js dev") always use 3001 — vite owns the
 // front port and proxies /api here. In production, honor the platform's PORT.
 const isDev = process.argv.includes('dev')
-const port = isDev ? 3001 : process.env.PORT || 3001
+const port = isDev ? 3001 : process.env.PORT || 5000
 app.listen(port, '0.0.0.0', () => {
   console.log(`LinkCanvas server on :${port}${fs.existsSync(dist) ? ' (serving dist/)' : ' (API only — run vite for the frontend)'}`)
 })
