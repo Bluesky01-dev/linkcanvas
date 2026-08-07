@@ -1,0 +1,6 @@
+run = "npm start"
+entrypoint = "server/index.js"
+
+[deployment]
+build = ["sh", "-c", "npm install && npm run build"]
+run = ["sh", "-c", "node server/index.js"]

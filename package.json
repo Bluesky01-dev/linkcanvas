@@ -1,0 +1,30 @@
+{
+  "name": "linkcanvas",
+  "version": "1.0.0",
+  "description": "A link-in-bio template that paints its own artwork from your name. Every remix is one of a kind.",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"node server/index.js dev\" \"vite\"",
+    "build": "vite build",
+    "start": "npm run build && node server/index.js"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.1.0",
+    "@fontsource/instrument-serif": "^5.1.0",
+    "express": "^4.21.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.8.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "vite": "^6.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}
