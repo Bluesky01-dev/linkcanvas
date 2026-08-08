@@ -1,54 +1,47 @@
 # 🎨 LinkCanvas
 
-**A link-in-bio page that paints its own artwork from your name.**
+**A Linktree-style link-in-bio app that paints its own artwork from your name.**
 
-Type your name and LinkCanvas generates a living, animated background that is
-mathematically unique to you — same name, same artwork, forever. Every remix
-of this template looks completely different from every other, automatically.
+Clean white-and-blue out of the box, six switchable themes, and one signature
+trick: the animated background is generated from your name — same name, same
+artwork, forever. Every remix of this template looks different automatically.
 
 ## Remix this in 3 steps
 
 1. **Remix this app** on Replit.
 2. Hit **Run**, open the page, and click **✎ Edit** in the corner.
-3. Type your name, add your links, hit **Save**. Done — that's your page.
+3. Type your name, add your links and socials, pick a theme, hit **Save**.
 
-No code changes needed. Your artwork, colors, and accent are all derived
-from your name the moment you type it.
+No code changes needed.
 
-## What's inside
+## Features
 
-| Screen | What it does |
-|---|---|
-| `/` | Your public bio page — generative artwork, name, bio, link buttons |
-| `/edit` | Editor with a live artwork preview while you type |
-| `/stats` | Real analytics — page views, clicks per link, click-through rate |
-
-Every page view and link click is stored in a real database (SQLite, in
-`data/`). The stats page reads it back live.
-
-## How the generative art works
-
-- Your name is hashed into a **seed**
-- The seed deterministically picks one of **8 curated palettes**, one of
-  **3 movement modes** (streams · orbits · weave), and continuous parameters
-  (flow, density, drift)
-- A `<canvas>` particle system paints it in real time
-
-That's 24 broad families × infinite parameter variation. No two names collide
-in any way you'd ever notice. The animation pauses when the tab is hidden and
-respects `prefers-reduced-motion`.
+- **Bio page** — avatar (image URL or auto monogram), social icon row with
+  platform auto-detection (Instagram, YouTube, X, GitHub, LinkedIn, TikTok,
+  Twitch, Telegram, WhatsApp, email, websites), link buttons with emoji icons,
+  share/copy button
+- **Editor** (`/edit`) — tabbed (Profile · Links · Design) with a live phone
+  preview; reorder links, toggle them on/off, see per-link click counts inline
+- **Design system** — 6 named themes (Cloud, Sky, Paper, Midnight, Aurora,
+  Prism), 3 button styles (Solid, Soft, Outline), 3 corner shapes.
+  **Prism** hands the palette to your name-seed for the full generative look.
+- **Analytics** (`/stats`) — real page views, per-link clicks, click-through
+  rate, and a last-7-days activity chart, stored in a real database
+- **Generative engine** — 8 art palettes × 3 movement modes (streams, orbits,
+  weave) seeded by your name; pauses when the tab is hidden and respects
+  `prefers-reduced-motion`
 
 ## Customizing further
 
-- **Design tokens** — every color, font, radius, and spacing lives in
-  [`src/styles/tokens.css`](src/styles/tokens.css). Change tokens, change everything.
-- **Palettes** — add or edit moods in [`src/lib/palettes.js`](src/lib/palettes.js).
-- **Sample profile** — [`server/seed-data.js`](server/seed-data.js) (only used on first run).
+- **Admin design tokens** — [`src/styles/tokens.css`](src/styles/tokens.css)
+- **Bio themes** — add your own in [`src/lib/themes.js`](src/lib/themes.js)
+- **Art palettes** — [`src/lib/palettes.js`](src/lib/palettes.js)
+- **Sample profile** — [`server/seed-data.js`](server/seed-data.js) (first run only)
 
 ## Stack
 
-React + Vite · Express · SQLite (`better-sqlite3`, with an automatic
-JSON-file fallback so it runs anywhere) · zero UI libraries.
+React + Vite · Express · SQLite (`better-sqlite3`, with an automatic JSON-file
+fallback so it runs anywhere) · zero UI libraries.
 
 ```
 npm install
