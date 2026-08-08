@@ -12,25 +12,50 @@ app.get('/api/profile', (req, res) => {
   res.json(store.getProfile())
 })
 
+const THEMES = ['cloud', 'sky', 'paper', 'midnight', 'aurora', 'prism']
+const STYLES = ['solid', 'soft', 'outline']
+const SHAPES = ['rounded', 'pill', 'square']
+
 app.put('/api/profile', (req, res) => {
-  const { name, bio, links } = req.body ?? {}
+  const { name, bio, avatarUrl, theme, buttonStyle, shape, links, socials } = req.body ?? {}
   if (typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ error: 'Name is required.' })
   }
   if (!Array.isArray(links)) {
     return res.status(400).json({ error: 'Links must be a list.' })
   }
-  const clean = []
+  const cleanLinks = []
   for (const l of links) {
     const label = String(l?.label ?? '').trim()
     const url = String(l?.url ?? '').trim()
-    if (!label || !url) continue
+    if (!label && !url) continue
+    if (!label || !url) {
+      return res.status(400).json({ error: 'Every link needs both a label and a URL.' })
+    }
     if (!/^(https?:\/\/|mailto:)/i.test(url)) {
       return res.status(400).json({ error: `"${label}" needs a link starting with http(s):// or mailto:` })
     }
-    clean.push({ id: Number.isInteger(l?.id) ? l.id : null, label, url })
+    cleanLinks.push({
+      id: Number.isInteger(l?.id) ? l.id : null,
+      label,
+      url,
+      icon: String(l?.icon ?? '').slice(0, 8),
+      enabled: l?.enabled ? 1 : 0,
+    })
   }
-  store.saveProfile({ name: name.trim(), bio: String(bio ?? '').trim(), links: clean })
+  const cleanSocials = (Array.isArray(socials) ? socials : [])
+    .map((u) => String(u ?? '').trim())
+    .filter((u) => /^(https?:\/\/|mailto:)/i.test(u))
+  store.saveProfile({
+    name: name.trim(),
+    bio: String(bio ?? '').trim(),
+    avatarUrl: String(avatarUrl ?? '').trim(),
+    theme: THEMES.includes(theme) ? theme : 'cloud',
+    buttonStyle: STYLES.includes(buttonStyle) ? buttonStyle : 'solid',
+    shape: SHAPES.includes(shape) ? shape : 'rounded',
+    links: cleanLinks,
+    socials: cleanSocials,
+  })
   res.json(store.getProfile())
 })
 

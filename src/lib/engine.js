@@ -6,10 +6,13 @@
 import { seedFrom, mulberry32 } from './seed.js'
 import { PALETTES } from './palettes.js'
 
-export function sceneParamsFor(text) {
+// themePalette: {bg, colors, fade} from a theme, or null to let the
+// name-seed pick one of the eight art palettes (Prism mode).
+export function sceneParamsFor(text, themePalette = null) {
   const seed = seedFrom(text)
   const rand = mulberry32(seed)
-  const palette = PALETTES[Math.floor(rand() * PALETTES.length)]
+  const seeded = PALETTES[Math.floor(rand() * PALETTES.length)]
+  const palette = themePalette ?? seeded
   const mode = Math.floor(rand() * 3) // 0 streams · 1 orbits · 2 weave
   return {
     seed,
@@ -21,7 +24,7 @@ export function sceneParamsFor(text) {
     drift: rand() * Math.PI * 2,
     speed: 0.45 + rand() * 0.85,
     density: 150 + Math.floor(rand() * 130),
-    fade: 0.05 + rand() * 0.045,
+    fade: themePalette?.fade ?? 0.05 + rand() * 0.045,
     rings: 3 + Math.floor(rand() * 4),
     weaveA: 2 + Math.floor(rand() * 4),
     weaveB: 3 + Math.floor(rand() * 4),
@@ -65,8 +68,9 @@ function step(ctx, p, parts, w, h, time) {
   ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = hexA(p.palette.bg[0], p.fade)
   ctx.fillRect(0, 0, w, h)
-  ctx.globalCompositeOperation = 'lighter'
-  ctx.lineWidth = 1.1
+  // dark themes: additive glow. light themes: normal ink on paper.
+  ctx.globalCompositeOperation = p.dark ? 'lighter' : 'source-over'
+  ctx.lineWidth = p.dark ? 1.1 : 1.3
 
   const cx = w / 2
   const cy = h / 2
@@ -114,7 +118,7 @@ function step(ctx, p, parts, w, h, time) {
     const jump = Math.abs(pt.x - px) + Math.abs(pt.y - py)
     if (jump > 60) continue // never draw teleport streaks
 
-    ctx.strokeStyle = hexA(pt.color, 0.5)
+    ctx.strokeStyle = hexA(pt.color, p.dark ? 0.5 : 0.32)
     ctx.beginPath()
     ctx.moveTo(px, py)
     ctx.lineTo(pt.x, pt.y)
@@ -138,14 +142,15 @@ function hexA(hex, alpha) {
 
 // Mounts the scene on a canvas. Returns a controller with destroy().
 // Handles: DPR, resize, tab-visibility pause, prefers-reduced-motion.
-export function mountScene(canvas, seedText) {
+export function mountScene(canvas, seedText, themePalette = null, dark = true) {
   const ctx = canvas.getContext('2d')
   let raf = 0
   let parts = []
   let w = 0
   let h = 0
   let destroyed = false
-  const p = sceneParamsFor(seedText)
+  const p = sceneParamsFor(seedText, themePalette)
+  p.dark = themePalette ? dark : true // seeded art palettes are always dark
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   function size() {

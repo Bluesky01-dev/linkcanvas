@@ -1,58 +1,53 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import GenerativeCanvas from '../components/GenerativeCanvas.jsx'
-import { accentFor } from '../lib/engine.js'
+import BioView from '../components/BioView.jsx'
 import { api } from '../lib/api.js'
 
 export default function Bio() {
   const [profile, setProfile] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     api.getProfile().then(setProfile).catch(console.error)
-    // count one view per browser session
     if (!sessionStorage.getItem('lc-viewed')) {
       sessionStorage.setItem('lc-viewed', '1')
       api.view()
     }
   }, [])
 
+  async function share() {
+    const url = window.location.origin
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: profile.name, url })
+        return
+      } catch {
+        /* fall through to copy */
+      }
+    }
+    await navigator.clipboard.writeText(url).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1600)
+  }
+
   if (!profile) return null
 
-  const accent = accentFor(profile.name)
-
   return (
-    <main className="bio" style={{ '--accent': accent }}>
-      <GenerativeCanvas seedText={profile.name} className="bio__canvas" />
+    <div className="biopage">
+      <BioView profile={profile} onLinkClick={(id) => api.click(id)} />
 
-      <div className="bio__card">
-        <div className="bio__avatar">{[...profile.name][0]?.toUpperCase() ?? '?'}</div>
-        <h1 className="bio__name">{profile.name}</h1>
-        {profile.bio && <p className="bio__tagline">{profile.bio}</p>}
+      <button className="biopage__share" onClick={share} aria-label="Share this page">
+        {copied ? 'Copied!' : '↑ Share'}
+      </button>
 
-        <nav className="bio__links" aria-label="Links">
-          {profile.links.map((l) => (
-            <a
-              key={l.id}
-              className="linkbtn"
-              href={l.url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => api.click(l.id)}
-            >
-              {l.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      <div className="bio__nav">
-        <Link className="bio__navlink" to="/edit">
+      <div className="biopage__nav">
+        <Link className="biopage__navlink" to="/edit">
           ✎ Edit
         </Link>
-        <Link className="bio__navlink" to="/stats">
+        <Link className="biopage__navlink" to="/stats">
           ↗ Stats
         </Link>
       </div>
-    </main>
+    </div>
   )
 }

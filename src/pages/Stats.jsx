@@ -1,29 +1,32 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { accentFor } from '../lib/engine.js'
 import { api } from '../lib/api.js'
 
 export default function Stats() {
   const [stats, setStats] = useState(null)
-  const [name, setName] = useState('')
 
   useEffect(() => {
     api.getStats().then(setStats).catch(console.error)
-    api.getProfile().then((p) => setName(p.name)).catch(() => {})
   }, [])
 
   if (!stats) return null
 
-  const max = Math.max(1, ...stats.clicks.map((c) => c.count))
+  const maxClicks = Math.max(1, ...stats.clicks.map((c) => c.count))
+  const maxDay = Math.max(1, ...stats.days.map((d) => d.views + d.clicks))
   const ctr = stats.views > 0 ? Math.round((stats.totalClicks / stats.views) * 100) : 0
 
   return (
-    <main className="page" style={{ '--accent': accentFor(name) }}>
+    <main className="page">
       <div className="page__top">
         <h1 className="page__title">Your numbers</h1>
-        <Link className="backlink" to="/">
-          ← Back to your page
-        </Link>
+        <div className="page__topactions">
+          <Link className="backlink" to="/edit">
+            ✎ Edit
+          </Link>
+          <Link className="backlink" to="/">
+            ← Your page
+          </Link>
+        </div>
       </div>
 
       <div className="stats__tiles">
@@ -41,7 +44,27 @@ export default function Stats() {
         </div>
       </div>
 
-      <section className="card">
+      <section className="card stats__section">
+        <h2 className="stats__heading">Last 7 days</h2>
+        <div className="weekchart" role="img" aria-label="Views and clicks per day, last 7 days">
+          {stats.days.map((d) => (
+            <div className="weekchart__col" key={d.day} title={`${d.day}: ${d.views} views, ${d.clicks} clicks`}>
+              <div className="weekchart__bars">
+                <div className="weekchart__bar weekchart__bar--views" style={{ height: `${(d.views / maxDay) * 100}%` }} />
+                <div className="weekchart__bar weekchart__bar--clicks" style={{ height: `${(d.clicks / maxDay) * 100}%` }} />
+              </div>
+              <span className="weekchart__day">{d.day.slice(8)}</span>
+            </div>
+          ))}
+        </div>
+        <div className="weekchart__legend">
+          <span className="weekchart__key weekchart__key--views">Views</span>
+          <span className="weekchart__key weekchart__key--clicks">Clicks</span>
+        </div>
+      </section>
+
+      <section className="card stats__section">
+        <h2 className="stats__heading">Clicks per link</h2>
         {stats.clicks.length === 0 ? (
           <p className="empty">Add some links in the editor, then watch the clicks land here.</p>
         ) : (
@@ -49,7 +72,7 @@ export default function Stats() {
             <div className="statrow" key={c.id}>
               <span className="statrow__label">{c.label}</span>
               <div className="statrow__bar">
-                <div className="statrow__fill" style={{ width: `${(c.count / max) * 100}%` }} />
+                <div className="statrow__fill" style={{ width: `${(c.count / maxClicks) * 100}%` }} />
               </div>
               <span className="statrow__count">{c.count}</span>
             </div>

@@ -1,12 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import GenerativeCanvas from '../components/GenerativeCanvas.jsx'
-import { accentFor } from '../lib/engine.js'
+import BioView from '../components/BioView.jsx'
+import { THEMES } from '../lib/themes.js'
+import { SocialIcon, platformLabel } from '../lib/icons.jsx'
 import { api } from '../lib/api.js'
+
+const TABS = ['Profile', 'Links', 'Design']
+const STYLES = [
+  { id: 'solid', name: 'Solid' },
+  { id: 'soft', name: 'Soft' },
+  { id: 'outline', name: 'Outline' },
+]
+const SHAPES = [
+  { id: 'rounded', name: 'Rounded' },
+  { id: 'pill', name: 'Pill' },
+  { id: 'square', name: 'Square' },
+]
 
 export default function Editor() {
   const [profile, setProfile] = useState(null)
-  const [msg, setMsg] = useState(null) // { text, error }
+  const [clicksById, setClicksById] = useState({})
+  const [tab, setTab] = useState('Profile')
+  const [msg, setMsg] = useState(null)
   const [saving, setSaving] = useState(false)
   const [previewSeed, setPreviewSeed] = useState('')
   const debounceRef = useRef(0)
@@ -19,28 +34,36 @@ export default function Editor() {
         setPreviewSeed(p.name)
       })
       .catch(console.error)
+    api
+      .getStats()
+      .then((s) => setClicksById(Object.fromEntries(s.clicks.map((c) => [c.id, c.count]))))
+      .catch(() => {})
   }, [])
 
-  // debounce the artwork preview while typing a name
+  function patch(p) {
+    setProfile((prev) => ({ ...prev, ...p }))
+  }
+
   function setName(name) {
-    setProfile((p) => ({ ...p, name }))
+    patch({ name })
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => setPreviewSeed(name), 300)
   }
 
-  function setLink(i, patch) {
-    setProfile((p) => ({
-      ...p,
-      links: p.links.map((l, j) => (j === i ? { ...l, ...patch } : l)),
-    }))
+  function setLink(i, p) {
+    patch({ links: profile.links.map((l, j) => (j === i ? { ...l, ...p } : l)) })
   }
 
-  function addLink() {
-    setProfile((p) => ({ ...p, links: [...p.links, { label: '', url: '' }] }))
+  function moveLink(i, dir) {
+    const links = [...profile.links]
+    const j = i + dir
+    if (j < 0 || j >= links.length) return
+    ;[links[i], links[j]] = [links[j], links[i]]
+    patch({ links })
   }
 
-  function removeLink(i) {
-    setProfile((p) => ({ ...p, links: p.links.filter((_, j) => j !== i) }))
+  function setSocial(i, url) {
+    patch({ socials: profile.socials.map((s, j) => (j === i ? url : s)) })
   }
 
   async function save() {
@@ -59,88 +82,253 @@ export default function Editor() {
 
   if (!profile) return null
 
-  const accent = accentFor(previewSeed || profile.name)
+  const previewProfile = { ...profile, name: profile.name || 'Your name' }
 
   return (
-    <main className="page" style={{ '--accent': accent }}>
+    <main className="page">
       <div className="page__top">
         <h1 className="page__title">Edit your page</h1>
-        <Link className="backlink" to="/">
-          ← Back to your page
-        </Link>
+        <div className="page__topactions">
+          <Link className="backlink" to="/stats">
+            ↗ Stats
+          </Link>
+          <Link className="backlink" to="/">
+            ← Your page
+          </Link>
+        </div>
       </div>
 
       <div className="editor">
-        <section className="card">
-          <div className="field">
-            <label htmlFor="name">Name — this paints your artwork</label>
-            <input
-              id="name"
-              className="input"
-              value={profile.name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="bio">Bio</label>
-            <input
-              id="bio"
-              className="input"
-              value={profile.bio}
-              onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-              placeholder="One line about you"
-            />
-          </div>
-
-          <div className="field">
-            <label>Links</label>
-            {profile.links.map((l, i) => (
-              <div className="linkrow" key={l.id ?? `new-${i}`}>
-                <input
-                  className="input"
-                  value={l.label}
-                  onChange={(e) => setLink(i, { label: e.target.value })}
-                  placeholder="Label"
-                  aria-label={`Link ${i + 1} label`}
-                />
-                <input
-                  className="input"
-                  value={l.url}
-                  onChange={(e) => setLink(i, { url: e.target.value })}
-                  placeholder="https://…"
-                  aria-label={`Link ${i + 1} URL`}
-                />
-                <button className="btn btn--danger" onClick={() => removeLink(i)} aria-label={`Remove link ${i + 1}`}>
-                  ✕
-                </button>
-              </div>
+        <section>
+          <div className="tabs" role="tablist">
+            {TABS.map((t) => (
+              <button
+                key={t}
+                role="tab"
+                aria-selected={tab === t}
+                className={`tab${tab === t ? ' tab--active' : ''}`}
+                onClick={() => setTab(t)}
+              >
+                {t}
+              </button>
             ))}
-            <div>
-              <button className="btn btn--ghost" onClick={addLink}>
+          </div>
+
+          {tab === 'Profile' && (
+            <div className="card">
+              <div className="field">
+                <label htmlFor="name">Name</label>
+                <input
+                  id="name"
+                  className="input"
+                  value={profile.name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                />
+                <p className="field__hint">Your name also paints the animated artwork — try changing it.</p>
+              </div>
+
+              <div className="field">
+                <label htmlFor="bio">Bio</label>
+                <input
+                  id="bio"
+                  className="input"
+                  value={profile.bio}
+                  onChange={(e) => patch({ bio: e.target.value })}
+                  placeholder="One line about you"
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="avatar">Avatar image URL</label>
+                <input
+                  id="avatar"
+                  className="input"
+                  value={profile.avatarUrl}
+                  onChange={(e) => patch({ avatarUrl: e.target.value })}
+                  placeholder="https://…/me.jpg — empty = monogram"
+                />
+              </div>
+
+              <div className="field">
+                <label>Social icons</label>
+                <p className="field__hint">Shown as an icon row under your bio. The icon is detected from the URL.</p>
+                {profile.socials.map((url, i) => (
+                  <div className="socialrow" key={i}>
+                    <span className="socialrow__icon">
+                      <SocialIcon url={url} size={18} />
+                    </span>
+                    <input
+                      className="input"
+                      value={url}
+                      onChange={(e) => setSocial(i, e.target.value)}
+                      placeholder="https://instagram.com/you"
+                      aria-label={`Social ${i + 1} (${platformLabel(url)})`}
+                    />
+                    <button
+                      className="iconbtn"
+                      onClick={() => patch({ socials: profile.socials.filter((_, j) => j !== i) })}
+                      aria-label="Remove social"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <div>
+                  <button className="btn btn--ghost" onClick={() => patch({ socials: [...profile.socials, ''] })}>
+                    + Add social
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'Links' && (
+            <div className="card">
+              {profile.links.map((l, i) => (
+                <div className={`linkcard${l.enabled ? '' : ' linkcard--off'}`} key={l.id ?? `new-${i}`}>
+                  <div className="linkcard__reorder">
+                    <button className="iconbtn" onClick={() => moveLink(i, -1)} disabled={i === 0} aria-label="Move up">
+                      ↑
+                    </button>
+                    <button
+                      className="iconbtn"
+                      onClick={() => moveLink(i, 1)}
+                      disabled={i === profile.links.length - 1}
+                      aria-label="Move down"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                  <div className="linkcard__fields">
+                    <div className="linkcard__row">
+                      <input
+                        className="input input--icon"
+                        value={l.icon}
+                        onChange={(e) => setLink(i, { icon: e.target.value })}
+                        placeholder="🔗"
+                        aria-label={`Link ${i + 1} emoji`}
+                      />
+                      <input
+                        className="input"
+                        value={l.label}
+                        onChange={(e) => setLink(i, { label: e.target.value })}
+                        placeholder="Label"
+                        aria-label={`Link ${i + 1} label`}
+                      />
+                    </div>
+                    <input
+                      className="input"
+                      value={l.url}
+                      onChange={(e) => setLink(i, { url: e.target.value })}
+                      placeholder="https://…"
+                      aria-label={`Link ${i + 1} URL`}
+                    />
+                    {clicksById[l.id] > 0 && <span className="linkcard__clicks">{clicksById[l.id]} clicks</span>}
+                  </div>
+                  <div className="linkcard__side">
+                    <label className="switch" title={l.enabled ? 'Visible' : 'Hidden'}>
+                      <input
+                        type="checkbox"
+                        checked={!!l.enabled}
+                        onChange={(e) => setLink(i, { enabled: e.target.checked ? 1 : 0 })}
+                        aria-label={`Link ${i + 1} visible`}
+                      />
+                      <span className="switch__track" />
+                    </label>
+                    <button
+                      className="iconbtn"
+                      onClick={() => patch({ links: profile.links.filter((_, j) => j !== i) })}
+                      aria-label={`Delete link ${i + 1}`}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                className="btn btn--ghost"
+                onClick={() => patch({ links: [...profile.links, { label: '', url: '', icon: '', enabled: 1 }] })}
+              >
                 + Add link
               </button>
             </div>
-          </div>
+          )}
+
+          {tab === 'Design' && (
+            <div className="card">
+              <div className="field">
+                <label>Theme</label>
+                <div className="themegrid">
+                  {THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      className={`themecard${profile.theme === t.id ? ' themecard--active' : ''}`}
+                      onClick={() => patch({ theme: t.id })}
+                      aria-pressed={profile.theme === t.id}
+                    >
+                      <span
+                        className="themecard__swatch"
+                        style={{
+                          background: t.canvas
+                            ? `linear-gradient(135deg, ${t.canvas.bg[0]} 40%, ${t.canvas.colors[0]})`
+                            : 'linear-gradient(135deg, #10002b, #ff6b35, #00f5d4)',
+                        }}
+                      />
+                      <span className="themecard__name">{t.name}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="field__hint">Prism paints the palette from your name — every name is different.</p>
+              </div>
+
+              <div className="field">
+                <label>Button style</label>
+                <div className="seg">
+                  {STYLES.map((s) => (
+                    <button
+                      key={s.id}
+                      className={`seg__opt${profile.buttonStyle === s.id ? ' seg__opt--active' : ''}`}
+                      onClick={() => patch({ buttonStyle: s.id })}
+                      aria-pressed={profile.buttonStyle === s.id}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="field">
+                <label>Corners</label>
+                <div className="seg">
+                  {SHAPES.map((s) => (
+                    <button
+                      key={s.id}
+                      className={`seg__opt${profile.shape === s.id ? ' seg__opt--active' : ''}`}
+                      onClick={() => patch({ shape: s.id })}
+                      aria-pressed={profile.shape === s.id}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="editor__actions">
             <button className="btn btn--primary" onClick={save} disabled={saving}>
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Saving…' : 'Save changes'}
             </button>
             {msg && <span className={`savemsg${msg.error ? ' savemsg--error' : ''}`}>{msg.text}</span>}
           </div>
         </section>
 
         <aside className="editor__preview">
-          <div className="preview">
-            <GenerativeCanvas seedText={previewSeed} className="preview__canvas" />
-            <div className="preview__inner">
-              <div className="preview__name">{profile.name || 'Your name'}</div>
-              {profile.bio && <div className="preview__bio">{profile.bio}</div>}
-            </div>
+          <div className="phone">
+            <BioView profile={previewProfile} canvasSeed={previewSeed || previewProfile.name} preview />
           </div>
-          <p className="preview__hint">Every name paints a different artwork. Try typing yours.</p>
+          <p className="preview__hint">Live preview — saves apply to your real page.</p>
         </aside>
       </div>
     </main>
