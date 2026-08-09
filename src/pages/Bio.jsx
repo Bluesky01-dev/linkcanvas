@@ -4,7 +4,8 @@ import { FaArrowUpFromBracket, FaCheck, FaPen, FaChartSimple } from 'react-icons
 import BioView from '../components/BioView.jsx'
 import { api } from '../lib/api.js'
 
-export default function Bio() {
+// publicView: the clean share target (/s) — same page, no owner controls.
+export default function Bio({ publicView = false }) {
   const [profile, setProfile] = useState(null)
   const [copied, setCopied] = useState(false)
 
@@ -17,7 +18,8 @@ export default function Bio() {
   }, [])
 
   async function share() {
-    const url = window.location.origin
+    // always hand out the clean public URL — no edit/stats chrome
+    const url = `${window.location.origin}/s`
     if (navigator.share) {
       try {
         await navigator.share({ title: profile.name, url })
@@ -42,14 +44,16 @@ export default function Bio() {
         {copied ? 'Copied!' : 'Share'}
       </button>
 
-      <div className="biopage__nav">
-        <Link className="biopage__navlink" to="/edit">
-          <FaPen aria-hidden="true" /> Edit
-        </Link>
-        <Link className="biopage__navlink" to="/stats">
-          <FaChartSimple aria-hidden="true" /> Stats
-        </Link>
-      </div>
+      {!publicView && (
+        <div className="biopage__nav">
+          <Link className="biopage__navlink" to="/edit">
+            <FaPen aria-hidden="true" /> Edit
+          </Link>
+          <Link className="biopage__navlink" to="/stats">
+            <FaChartSimple aria-hidden="true" /> Stats
+          </Link>
+        </div>
+      )}
     </div>
   )
 }

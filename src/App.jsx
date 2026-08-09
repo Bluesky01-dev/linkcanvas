@@ -7,6 +7,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Bio />} />
+      <Route path="/s" element={<Bio publicView />} />
       <Route path="/edit" element={<Editor />} />
       <Route path="/stats" element={<Stats />} />
     </Routes>
