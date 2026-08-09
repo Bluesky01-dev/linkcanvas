@@ -16,6 +16,7 @@ import {
 import BioView from '../components/BioView.jsx'
 import { THEMES } from '../lib/themes.js'
 import { SocialIcon, platformLabel } from '../lib/icons.jsx'
+import { LINK_ICONS, LinkIcon } from '../lib/linkicons.jsx'
 import { api } from '../lib/api.js'
 
 const TABS = [
@@ -46,6 +47,7 @@ export default function Editor() {
   const [tab, setTab] = useState('Profile')
   const [msg, setMsg] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [pickerFor, setPickerFor] = useState(null) // link index with open icon picker
   const [previewSeed, setPreviewSeed] = useState('')
   const debounceRef = useRef(0)
 
@@ -266,13 +268,15 @@ export default function Editor() {
                   </div>
                   <div className="linkcard__fields">
                     <div className="linkcard__row">
-                      <input
-                        className="input input--icon"
-                        value={l.icon}
-                        onChange={(e) => setLink(i, { icon: e.target.value })}
-                        placeholder="🔗"
-                        aria-label={`Link ${i + 1} emoji`}
-                      />
+                      <button
+                        className={`iconpick__trigger${l.icon ? '' : ' iconpick__trigger--empty'}`}
+                        onClick={() => setPickerFor(pickerFor === i ? null : i)}
+                        aria-label={`Link ${i + 1} icon`}
+                        aria-expanded={pickerFor === i}
+                        title="Choose an icon"
+                      >
+                        {l.icon ? <LinkIcon value={l.icon} /> : <FaPlus aria-hidden="true" />}
+                      </button>
                       <input
                         className="input"
                         value={l.label}
@@ -281,6 +285,44 @@ export default function Editor() {
                         aria-label={`Link ${i + 1} label`}
                       />
                     </div>
+                    {pickerFor === i && (
+                      <div className="iconpick">
+                        <div className="iconpick__grid">
+                          <button
+                            className={`iconpick__opt${!l.icon ? ' iconpick__opt--active' : ''}`}
+                            onClick={() => {
+                              setLink(i, { icon: '' })
+                              setPickerFor(null)
+                            }}
+                            title="No icon"
+                            aria-label="No icon"
+                          >
+                            <FaXmark aria-hidden="true" />
+                          </button>
+                          {Object.entries(LINK_ICONS).map(([key, { icon: Icon, label }]) => (
+                            <button
+                              key={key}
+                              className={`iconpick__opt${l.icon === `fa:${key}` ? ' iconpick__opt--active' : ''}`}
+                              onClick={() => {
+                                setLink(i, { icon: `fa:${key}` })
+                                setPickerFor(null)
+                              }}
+                              title={label}
+                              aria-label={label}
+                            >
+                              <Icon aria-hidden="true" />
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          className="input iconpick__emoji"
+                          value={l.icon.startsWith('fa:') ? '' : l.icon}
+                          onChange={(e) => setLink(i, { icon: e.target.value })}
+                          placeholder="…or type an emoji 🔗"
+                          aria-label={`Link ${i + 1} custom emoji`}
+                        />
+                      </div>
+                    )}
                     <input
                       className="input"
                       value={l.url}

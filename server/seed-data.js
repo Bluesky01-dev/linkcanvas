@@ -11,10 +11,10 @@ export const SAMPLE_PROFILE = {
   accentColor: '',
   bgColor: '',
   links: [
-    { label: 'My portfolio', url: 'https://example.com', icon: '💼', enabled: 1 },
-    { label: 'Latest YouTube video', url: 'https://youtube.com', icon: '▶️', enabled: 1 },
-    { label: 'Newsletter', url: 'https://example.com/newsletter', icon: '✉️', enabled: 1 },
-    { label: 'Book a call', url: 'https://example.com/call', icon: '📅', enabled: 1 },
+    { label: 'My portfolio', url: 'https://example.com', icon: 'fa:briefcase', enabled: 1 },
+    { label: 'Latest YouTube video', url: 'https://youtube.com', icon: 'fa:play', enabled: 1 },
+    { label: 'Newsletter', url: 'https://example.com/newsletter', icon: 'fa:envelope', enabled: 1 },
+    { label: 'Book a call', url: 'https://example.com/call', icon: 'fa:calendar', enabled: 1 },
   ],
   socials: [
     'https://instagram.com/nova',

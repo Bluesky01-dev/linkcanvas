@@ -69,7 +69,7 @@ app.put('/api/profile', (req, res) => {
       id: Number.isInteger(l?.id) ? l.id : null,
       label,
       url,
-      icon: String(l?.icon ?? '').slice(0, 8),
+      icon: String(l?.icon ?? '').slice(0, 32),
       enabled: l?.enabled ? 1 : 0,
     })
   }

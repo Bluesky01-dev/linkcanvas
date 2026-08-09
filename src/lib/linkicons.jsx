@@ -1,0 +1,100 @@
+// Curated icon set for link buttons. Stored on a link as "fa:<key>".
+// Plain emoji strings are still supported — the picker offers both.
+import {
+  FaBriefcase,
+  FaVideo,
+  FaEnvelope,
+  FaCalendarDays,
+  FaCartShopping,
+  FaBagShopping,
+  FaMusic,
+  FaMicrophone,
+  FaBook,
+  FaPenNib,
+  FaDownload,
+  FaStar,
+  FaHeart,
+  FaCamera,
+  FaGamepad,
+  FaCode,
+  FaMugHot,
+  FaGift,
+  FaTicket,
+  FaLocationDot,
+  FaPhone,
+  FaGlobe,
+  FaRocket,
+  FaPalette,
+  FaGraduationCap,
+  FaDumbbell,
+  FaUtensils,
+  FaPlane,
+  FaDollarSign,
+  FaChartLine,
+  FaUsers,
+  FaFileLines,
+  FaHeadphones,
+  FaMobileScreen,
+  FaNewspaper,
+  FaLightbulb,
+  FaLink,
+  FaPlay,
+  FaImage,
+  FaHandshake,
+} from 'react-icons/fa6'
+
+export const LINK_ICONS = {
+  briefcase: { icon: FaBriefcase, label: 'Work' },
+  video: { icon: FaVideo, label: 'Video' },
+  envelope: { icon: FaEnvelope, label: 'Mail' },
+  calendar: { icon: FaCalendarDays, label: 'Calendar' },
+  cart: { icon: FaCartShopping, label: 'Shop' },
+  bag: { icon: FaBagShopping, label: 'Store' },
+  music: { icon: FaMusic, label: 'Music' },
+  mic: { icon: FaMicrophone, label: 'Podcast' },
+  book: { icon: FaBook, label: 'Book' },
+  pen: { icon: FaPenNib, label: 'Writing' },
+  download: { icon: FaDownload, label: 'Download' },
+  star: { icon: FaStar, label: 'Featured' },
+  heart: { icon: FaHeart, label: 'Support' },
+  camera: { icon: FaCamera, label: 'Photos' },
+  gamepad: { icon: FaGamepad, label: 'Gaming' },
+  code: { icon: FaCode, label: 'Code' },
+  coffee: { icon: FaMugHot, label: 'Coffee' },
+  gift: { icon: FaGift, label: 'Gift' },
+  ticket: { icon: FaTicket, label: 'Tickets' },
+  location: { icon: FaLocationDot, label: 'Location' },
+  phone: { icon: FaPhone, label: 'Call' },
+  globe: { icon: FaGlobe, label: 'Website' },
+  rocket: { icon: FaRocket, label: 'Launch' },
+  palette: { icon: FaPalette, label: 'Art' },
+  graduation: { icon: FaGraduationCap, label: 'Course' },
+  dumbbell: { icon: FaDumbbell, label: 'Fitness' },
+  utensils: { icon: FaUtensils, label: 'Food' },
+  plane: { icon: FaPlane, label: 'Travel' },
+  dollar: { icon: FaDollarSign, label: 'Pricing' },
+  chart: { icon: FaChartLine, label: 'Results' },
+  users: { icon: FaUsers, label: 'Community' },
+  file: { icon: FaFileLines, label: 'Resume' },
+  headphones: { icon: FaHeadphones, label: 'Listen' },
+  mobile: { icon: FaMobileScreen, label: 'App' },
+  newspaper: { icon: FaNewspaper, label: 'News' },
+  lightbulb: { icon: FaLightbulb, label: 'Ideas' },
+  link: { icon: FaLink, label: 'Link' },
+  play: { icon: FaPlay, label: 'Watch' },
+  image: { icon: FaImage, label: 'Gallery' },
+  handshake: { icon: FaHandshake, label: 'Partner' },
+}
+
+// Renders a stored link icon value: "fa:<key>" -> icon component,
+// anything else non-empty -> emoji text. Returns null for empty/unknown.
+export function LinkIcon({ value, size = 18 }) {
+  if (!value) return null
+  if (value.startsWith('fa:')) {
+    const entry = LINK_ICONS[value.slice(3)]
+    if (!entry) return null
+    const Icon = entry.icon
+    return <Icon size={size} aria-hidden="true" />
+  }
+  return <span aria-hidden="true">{value}</span>
+}

@@ -2,6 +2,7 @@ import GenerativeCanvas from './GenerativeCanvas.jsx'
 import { themeById } from '../lib/themes.js'
 import { accentFor } from '../lib/engine.js'
 import { SocialIcon, platformLabel } from '../lib/icons.jsx'
+import { LinkIcon } from '../lib/linkicons.jsx'
 import { inkFor, isDarkColor, HEX_RE } from '../lib/color.js'
 
 // The whole public page as one presentational component —
@@ -101,7 +102,11 @@ export default function BioView({ profile, onLinkClick, preview = false, canvasS
               rel="noreferrer"
               onClick={(e) => handleClick(e, l.id)}
             >
-              {l.icon && <span className="linkbtn__icon">{l.icon}</span>}
+              {l.icon && (
+                <span className="linkbtn__icon">
+                  <LinkIcon value={l.icon} />
+                </span>
+              )}
               <span className="linkbtn__label">{l.label}</span>
             </a>
           ))}
