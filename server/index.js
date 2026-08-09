@@ -1,10 +1,37 @@
 import express from 'express'
 import fs from 'node:fs'
 import path from 'node:path'
+import multer from 'multer'
 import { store } from './db.js'
 
 const app = express()
 app.use(express.json())
+
+// ---- Avatar uploads ------------------------------------------------------
+
+const uploadsDir = path.join(process.cwd(), 'data', 'uploads')
+fs.mkdirSync(uploadsDir, { recursive: true })
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadsDir,
+    filename: (req, file, cb) => {
+      const ext = (path.extname(file.originalname) || '.png').toLowerCase()
+      cb(null, `avatar-${Date.now()}${ext}`)
+    },
+  }),
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => cb(null, /^image\/(png|jpe?g|webp|gif)$/.test(file.mimetype)),
+})
+
+app.post('/api/avatar', upload.single('avatar'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Upload a PNG, JPG, WebP, or GIF up to 2 MB.' })
+  }
+  res.json({ url: `/uploads/${req.file.filename}` })
+})
+
+app.use('/uploads', express.static(uploadsDir))
 
 // ---- API ----------------------------------------------------------------
 
@@ -16,9 +43,11 @@ const THEMES = ['cloud', 'sky', 'paper', 'midnight', 'aurora', 'prism']
 const BACKGROUNDS = ['art', 'solid']
 const STYLES = ['solid', 'soft', 'outline']
 const SHAPES = ['rounded', 'pill', 'square']
+const HEX_RE = /^#[0-9a-f]{6}$/i
 
 app.put('/api/profile', (req, res) => {
-  const { name, bio, avatarUrl, theme, background, buttonStyle, shape, links, socials } = req.body ?? {}
+  const { name, bio, avatarUrl, theme, background, buttonStyle, shape, accentColor, bgColor, links, socials } =
+    req.body ?? {}
   if (typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ error: 'Name is required.' })
   }
@@ -55,6 +84,8 @@ app.put('/api/profile', (req, res) => {
     background: BACKGROUNDS.includes(background) ? background : 'art',
     buttonStyle: STYLES.includes(buttonStyle) ? buttonStyle : 'solid',
     shape: SHAPES.includes(shape) ? shape : 'rounded',
+    accentColor: HEX_RE.test(accentColor) ? accentColor : '',
+    bgColor: HEX_RE.test(bgColor) ? bgColor : '',
     links: cleanLinks,
     socials: cleanSocials,
   })

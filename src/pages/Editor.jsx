@@ -10,6 +10,8 @@ const BACKGROUNDS = [
   { id: 'art', name: 'Animated' },
   { id: 'solid', name: 'Solid' },
 ]
+const ACCENT_PRESETS = ['#2563eb', '#0ea5e9', '#7c3aed', '#db2777', '#dc2626', '#ea580c', '#16a34a', '#0f172a']
+const BG_PRESETS = ['#ffffff', '#f6f8fc', '#fef3c7', '#dcfce7', '#e0e7ff', '#0f172a', '#1e1b4b', '#022c22']
 const STYLES = [
   { id: 'solid', name: 'Solid' },
   { id: 'soft', name: 'Soft' },
@@ -68,6 +70,22 @@ export default function Editor() {
 
   function setSocial(i, url) {
     patch({ socials: profile.socials.map((s, j) => (j === i ? url : s)) })
+  }
+
+  async function uploadAvatar(file) {
+    if (!file) return
+    setMsg(null)
+    try {
+      const fd = new FormData()
+      fd.append('avatar', file)
+      const res = await fetch('/api/avatar', { method: 'POST', body: fd })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error || 'Upload failed')
+      patch({ avatarUrl: body.url })
+      setMsg({ text: 'Picture uploaded — hit Save to keep it.' })
+    } catch (err) {
+      setMsg({ text: err.message, error: true })
+    }
   }
 
   async function save() {
@@ -144,13 +162,38 @@ export default function Editor() {
               </div>
 
               <div className="field">
-                <label htmlFor="avatar">Avatar image URL</label>
+                <label>Profile picture</label>
+                <div className="avatarrow">
+                  {profile.avatarUrl ? (
+                    <img className="avatarrow__img" src={profile.avatarUrl} alt="Current avatar" />
+                  ) : (
+                    <div className="avatarrow__img avatarrow__img--mono">
+                      {[...(profile.name || '?')][0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <div className="avatarrow__actions">
+                    <label className="btn btn--ghost avatarrow__upload">
+                      Upload image
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        hidden
+                        onChange={(e) => uploadAvatar(e.target.files?.[0])}
+                      />
+                    </label>
+                    {profile.avatarUrl && (
+                      <button className="btn btn--ghost" onClick={() => patch({ avatarUrl: '' })}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <input
                   id="avatar"
                   className="input"
                   value={profile.avatarUrl}
                   onChange={(e) => patch({ avatarUrl: e.target.value })}
-                  placeholder="https://…/me.jpg — empty = monogram"
+                  placeholder="…or paste an image URL — empty = monogram"
                 />
               </div>
 
@@ -301,6 +344,71 @@ export default function Editor() {
                   ))}
                 </div>
                 <p className="field__hint">Solid uses the theme's plain background color — no artwork.</p>
+              </div>
+
+              {profile.background === 'solid' && (
+                <div className="field">
+                  <label>Background color</label>
+                  <div className="swatches">
+                    <button
+                      className={`swatch swatch--none${!profile.bgColor ? ' swatch--active' : ''}`}
+                      onClick={() => patch({ bgColor: '' })}
+                      title="Theme default"
+                      aria-label="Theme default background"
+                    >
+                      ✕
+                    </button>
+                    {BG_PRESETS.map((c) => (
+                      <button
+                        key={c}
+                        className={`swatch${profile.bgColor === c ? ' swatch--active' : ''}`}
+                        style={{ background: c }}
+                        onClick={() => patch({ bgColor: c })}
+                        aria-label={`Background ${c}`}
+                      />
+                    ))}
+                    <label className="swatch swatch--custom" title="Custom color">
+                      <input
+                        type="color"
+                        value={profile.bgColor || '#f6f8fc'}
+                        onChange={(e) => patch({ bgColor: e.target.value })}
+                        aria-label="Custom background color"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="field">
+                <label>Button color</label>
+                <div className="swatches">
+                  <button
+                    className={`swatch swatch--none${!profile.accentColor ? ' swatch--active' : ''}`}
+                    onClick={() => patch({ accentColor: '' })}
+                    title="Theme default"
+                    aria-label="Theme default button color"
+                  >
+                    ✕
+                  </button>
+                  {ACCENT_PRESETS.map((c) => (
+                    <button
+                      key={c}
+                      className={`swatch${profile.accentColor === c ? ' swatch--active' : ''}`}
+                      style={{ background: c }}
+                      onClick={() => patch({ accentColor: c })}
+                      aria-label={`Button color ${c}`}
+                    />
+                  ))}
+                  <label className="swatch swatch--custom" title="Custom color">
+                    <input
+                      type="color"
+                      value={profile.accentColor || '#2563eb'}
+                      onChange={(e) => patch({ accentColor: e.target.value })}
+                      aria-label="Custom button color"
+                    />
+                  </label>
+                </div>
+                <p className="field__hint">✕ follows the theme. Custom colors keep text readable automatically.</p>
               </div>
 
               <div className="field">

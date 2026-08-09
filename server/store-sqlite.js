@@ -42,11 +42,17 @@ db.exec(`
   );
 `)
 
-// existing v2 databases: add the background column if it's missing
-try {
-  db.exec("ALTER TABLE profile ADD COLUMN background TEXT NOT NULL DEFAULT 'art'")
-} catch {
-  /* column already exists */
+// existing v2 databases: add columns introduced after the first v2 release
+for (const ddl of [
+  "ALTER TABLE profile ADD COLUMN background TEXT NOT NULL DEFAULT 'art'",
+  "ALTER TABLE profile ADD COLUMN accent_color TEXT NOT NULL DEFAULT ''",
+  "ALTER TABLE profile ADD COLUMN bg_color TEXT NOT NULL DEFAULT ''",
+]) {
+  try {
+    db.exec(ddl)
+  } catch {
+    /* column already exists */
+  }
 }
 
 if (!db.prepare('SELECT id FROM profile WHERE id = 1').get()) {
@@ -64,7 +70,7 @@ export const store = {
   getProfile() {
     const p = db
       .prepare(
-        'SELECT name, bio, avatar_url avatarUrl, theme, background, button_style buttonStyle, shape FROM profile WHERE id = 1'
+        'SELECT name, bio, avatar_url avatarUrl, theme, background, button_style buttonStyle, shape, accent_color accentColor, bg_color bgColor FROM profile WHERE id = 1'
       )
       .get()
     const links = db.prepare('SELECT id, label, url, icon, enabled FROM links ORDER BY position').all()
@@ -72,11 +78,11 @@ export const store = {
     return { ...p, links, socials }
   },
 
-  saveProfile({ name, bio, avatarUrl, theme, background, buttonStyle, shape, links, socials }) {
+  saveProfile({ name, bio, avatarUrl, theme, background, buttonStyle, shape, accentColor, bgColor, links, socials }) {
     const tx = db.transaction(() => {
       db.prepare(
-        'UPDATE profile SET name = ?, bio = ?, avatar_url = ?, theme = ?, background = ?, button_style = ?, shape = ? WHERE id = 1'
-      ).run(name, bio, avatarUrl, theme, background, buttonStyle, shape)
+        'UPDATE profile SET name = ?, bio = ?, avatar_url = ?, theme = ?, background = ?, button_style = ?, shape = ?, accent_color = ?, bg_color = ? WHERE id = 1'
+      ).run(name, bio, avatarUrl, theme, background, buttonStyle, shape, accentColor, bgColor)
 
       const keep = links.filter((l) => l.id != null).map((l) => l.id)
       const existing = db.prepare('SELECT id FROM links').all().map((r) => r.id)

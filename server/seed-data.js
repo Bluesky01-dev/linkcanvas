@@ -8,6 +8,8 @@ export const SAMPLE_PROFILE = {
   background: 'art',
   buttonStyle: 'solid',
   shape: 'rounded',
+  accentColor: '',
+  bgColor: '',
   links: [
     { label: 'My portfolio', url: 'https://example.com', icon: '💼', enabled: 1 },
     { label: 'Latest YouTube video', url: 'https://youtube.com', icon: '▶️', enabled: 1 },

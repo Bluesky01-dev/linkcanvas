@@ -1,26 +1,45 @@
-// Minimal inline social icons, auto-detected from a URL's host.
+// Social icons from react-icons (Font Awesome 6 Free — open source),
+// auto-detected from a URL's host.
+import {
+  FaInstagram,
+  FaYoutube,
+  FaXTwitter,
+  FaGithub,
+  FaLinkedinIn,
+  FaTiktok,
+  FaTwitch,
+  FaTelegram,
+  FaWhatsapp,
+  FaFacebookF,
+  FaRedditAlien,
+  FaDribbble,
+  FaBehance,
+  FaMedium,
+  FaSpotify,
+  FaDiscord,
+  FaEnvelope,
+  FaGlobe,
+} from 'react-icons/fa6'
 
-const paths = {
-  instagram:
-    'M12 2.2c3.2 0 3.6 0 4.8.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.81s-.01 3.54-.07 4.81c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.81.07s-3.54-.01-4.81-.07c-3.26-.15-4.77-1.7-4.92-4.92C2.2 15.54 2.2 15.17 2.2 12s.01-3.54.07-4.81C2.42 3.96 3.94 2.42 7.19 2.27 8.46 2.21 8.84 2.2 12 2.2zm0 3.7a6.1 6.1 0 1 0 0 12.2 6.1 6.1 0 0 0 0-12.2zm0 2.2a3.9 3.9 0 1 1 0 7.8 3.9 3.9 0 0 1 0-7.8zm6.4-3.7a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z',
-  youtube:
-    'M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.5 9.38.5 9.38.5s7.5 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.55 15.57V8.43L15.82 12l-6.27 3.57z',
-  x: 'M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23zm-1.16 17.52h1.83L7.08 4.13H5.12z',
-  github:
-    'M12 .3a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58A12 12 0 0 0 12 .3',
-  linkedin:
-    'M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z',
-  tiktok:
-    'M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.9 2.9 0 1 1-2.08-2.78V9.36a6.33 6.33 0 1 0 5.52 6.31V8.74a8.16 8.16 0 0 0 4.77 1.52v-3.45a4.85 4.85 0 0 1-.99-.12z',
-  twitch:
-    'M11.57 4.14H13.3v5.14h-1.72zm4.72 0H18v5.14h-1.71zM4.29 0 0 4.29v15.42h5.14V24l4.29-4.29h3.43L20.57 12V0zm14.57 11.14-3.43 3.43H12l-3 3v-3H5.14V1.71h13.72z',
-  telegram:
-    'M11.94 2a10 10 0 1 0 .12 20 10 10 0 0 0-.12-20zm4.67 6.8-1.62 7.67c-.12.55-.44.68-.9.42l-2.48-1.83-1.2 1.15c-.13.13-.24.24-.5.24l.18-2.53 4.6-4.16c.2-.18-.04-.28-.31-.1l-5.69 3.58-2.45-.77c-.53-.17-.54-.53.11-.79l9.57-3.69c.44-.16.83.1.69.81z',
-  whatsapp:
-    'M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07a8.1 8.1 0 0 1-2.39-1.47 8.96 8.96 0 0 1-1.65-2.05c-.17-.3-.02-.46.13-.6.13-.14.3-.35.44-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.49.71.3 1.27.49 1.7.63.72.23 1.37.2 1.88.12.58-.09 1.76-.72 2-1.42.25-.7.25-1.3.18-1.42-.07-.12-.27-.2-.57-.35zM12.05 21.79a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 1 1 8.37 4.63zM12.05.5C5.7.5.55 5.66.55 12a11.4 11.4 0 0 0 1.53 5.73L.5 23.5l5.93-1.55a11.5 11.5 0 0 0 5.62 1.43c6.35 0 11.5-5.15 11.5-11.5S18.4.5 12.05.5z',
-  mail: 'M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.24-8 5-8-5V6.4l8 5 8-5z',
-  globe:
-    'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm7.93 9h-3.45a15.6 15.6 0 0 0-1.46-6.13A8.02 8.02 0 0 1 19.93 11zM12 4.06c.98 1.38 1.9 3.8 2.14 6.94H9.86c.24-3.14 1.16-5.56 2.14-6.94zM4.07 13h3.45a15.6 15.6 0 0 0 1.46 6.13A8.02 8.02 0 0 1 4.07 13zm3.45-2H4.07a8.02 8.02 0 0 1 4.91-6.13A15.6 15.6 0 0 0 7.52 11zM12 19.94c-.98-1.38-1.9-3.8-2.14-6.94h4.28c-.24 3.14-1.16 5.56-2.14 6.94zm3.02-.81A15.6 15.6 0 0 0 16.48 13h3.45a8.02 8.02 0 0 1-4.91 6.13z',
+const ICONS = {
+  instagram: { icon: FaInstagram, label: 'Instagram' },
+  youtube: { icon: FaYoutube, label: 'YouTube' },
+  x: { icon: FaXTwitter, label: 'X' },
+  github: { icon: FaGithub, label: 'GitHub' },
+  linkedin: { icon: FaLinkedinIn, label: 'LinkedIn' },
+  tiktok: { icon: FaTiktok, label: 'TikTok' },
+  twitch: { icon: FaTwitch, label: 'Twitch' },
+  telegram: { icon: FaTelegram, label: 'Telegram' },
+  whatsapp: { icon: FaWhatsapp, label: 'WhatsApp' },
+  facebook: { icon: FaFacebookF, label: 'Facebook' },
+  reddit: { icon: FaRedditAlien, label: 'Reddit' },
+  dribbble: { icon: FaDribbble, label: 'Dribbble' },
+  behance: { icon: FaBehance, label: 'Behance' },
+  medium: { icon: FaMedium, label: 'Medium' },
+  spotify: { icon: FaSpotify, label: 'Spotify' },
+  discord: { icon: FaDiscord, label: 'Discord' },
+  mail: { icon: FaEnvelope, label: 'Email' },
+  globe: { icon: FaGlobe, label: 'Website' },
 }
 
 const hosts = [
@@ -37,6 +56,15 @@ const hosts = [
   ['telegram.me', 'telegram'],
   ['wa.me', 'whatsapp'],
   ['whatsapp.com', 'whatsapp'],
+  ['facebook.com', 'facebook'],
+  ['fb.com', 'facebook'],
+  ['reddit.com', 'reddit'],
+  ['dribbble.com', 'dribbble'],
+  ['behance.net', 'behance'],
+  ['medium.com', 'medium'],
+  ['spotify.com', 'spotify'],
+  ['discord.gg', 'discord'],
+  ['discord.com', 'discord'],
 ]
 
 export function detectPlatform(url) {
@@ -52,16 +80,11 @@ export function detectPlatform(url) {
   return 'globe'
 }
 
-export function SocialIcon({ url, size = 20 }) {
-  const id = detectPlatform(url)
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d={paths[id]} />
-    </svg>
-  )
+export function SocialIcon({ url, size = 18 }) {
+  const Icon = ICONS[detectPlatform(url)].icon
+  return <Icon size={size} aria-hidden="true" />
 }
 
 export function platformLabel(url) {
-  const id = detectPlatform(url)
-  return id === 'globe' ? 'Website' : id === 'mail' ? 'Email' : id.charAt(0).toUpperCase() + id.slice(1)
+  return ICONS[detectPlatform(url)].label
 }
