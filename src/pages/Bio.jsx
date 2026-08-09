@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { FaArrowUpFromBracket, FaCheck, FaPen, FaChartSimple } from 'react-icons/fa6'
 import BioView from '../components/BioView.jsx'
 import { api } from '../lib/api.js'
 
@@ -37,15 +38,16 @@ export default function Bio() {
       <BioView profile={profile} onLinkClick={(id) => api.click(id)} />
 
       <button className="biopage__share" onClick={share} aria-label="Share this page">
-        {copied ? 'Copied!' : '↑ Share'}
+        {copied ? <FaCheck aria-hidden="true" /> : <FaArrowUpFromBracket aria-hidden="true" />}
+        {copied ? 'Copied!' : 'Share'}
       </button>
 
       <div className="biopage__nav">
         <Link className="biopage__navlink" to="/edit">
-          ✎ Edit
+          <FaPen aria-hidden="true" /> Edit
         </Link>
         <Link className="biopage__navlink" to="/stats">
-          ↗ Stats
+          <FaChartSimple aria-hidden="true" /> Stats
         </Link>
       </div>
     </div>

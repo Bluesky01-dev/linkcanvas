@@ -12,9 +12,23 @@ body,
 
 body {
   font-family: var(--font-body);
+  font-optical-sizing: auto;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headings everywhere: Inter Display (opsz 32), tight tracking */
+h1,
+h2,
+.bio__name,
+.page__title,
+.tile__value,
+.stats__heading,
+.preview__name {
+  font-family: var(--font-display);
+  font-variation-settings: var(--opsz-display);
+  letter-spacing: -0.02em;
 }
 
 a {
@@ -259,6 +273,9 @@ img {
   position: absolute;
   top: var(--sp-4);
   right: var(--sp-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-4);
   border-radius: var(--radius-pill);
   background: rgba(127, 127, 127, 0.16);
@@ -284,6 +301,9 @@ img {
 }
 
 .biopage__navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--radius-pill);
   background: rgba(127, 127, 127, 0.16);
@@ -330,10 +350,17 @@ img {
 }
 
 .backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--text-s);
   font-weight: 600;
   color: var(--text-dim);
   transition: color var(--dur-fast);
+}
+
+.backlink svg {
+  font-size: 0.8em;
 }
 
 .backlink:hover {
@@ -376,12 +403,19 @@ img {
 }
 
 .tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: var(--sp-2) var(--sp-5);
   border-radius: var(--radius-pill);
   font-size: var(--text-s);
   font-weight: 600;
   color: var(--text-dim);
   transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.tab svg {
+  font-size: 0.85em;
 }
 
 .tab--active {
@@ -820,6 +854,12 @@ img {
   box-shadow: var(--shadow-card);
 }
 
+.tile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .tile__label {
   font-size: var(--text-xs);
   font-weight: 650;
@@ -828,11 +868,23 @@ img {
   color: var(--text-dim);
 }
 
+.tile__icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-s);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--text-s);
+}
+
 .tile__value {
-  font-family: var(--font-display);
   font-size: var(--text-display);
+  font-weight: 700;
   line-height: 1.15;
   color: var(--accent);
+  margin-top: var(--sp-2);
 }
 
 .stats__section {

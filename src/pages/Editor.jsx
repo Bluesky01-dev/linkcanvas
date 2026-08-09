@@ -1,11 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  FaArrowLeft,
+  FaArrowDown,
+  FaArrowUp,
+  FaChartSimple,
+  FaLink,
+  FaPalette,
+  FaPlus,
+  FaTrashCan,
+  FaUpload,
+  FaUser,
+  FaXmark,
+} from 'react-icons/fa6'
 import BioView from '../components/BioView.jsx'
 import { THEMES } from '../lib/themes.js'
 import { SocialIcon, platformLabel } from '../lib/icons.jsx'
 import { api } from '../lib/api.js'
 
-const TABS = ['Profile', 'Links', 'Design']
+const TABS = [
+  { id: 'Profile', icon: FaUser },
+  { id: 'Links', icon: FaLink },
+  { id: 'Design', icon: FaPalette },
+]
 const BACKGROUNDS = [
   { id: 'art', name: 'Animated' },
   { id: 'solid', name: 'Solid' },
@@ -112,10 +129,10 @@ export default function Editor() {
         <h1 className="page__title">Edit your page</h1>
         <div className="page__topactions">
           <Link className="backlink" to="/stats">
-            ↗ Stats
+            <FaChartSimple aria-hidden="true" /> Stats
           </Link>
           <Link className="backlink" to="/">
-            ← Your page
+            <FaArrowLeft aria-hidden="true" /> Your page
           </Link>
         </div>
       </div>
@@ -123,15 +140,15 @@ export default function Editor() {
       <div className="editor">
         <section>
           <div className="tabs" role="tablist">
-            {TABS.map((t) => (
+            {TABS.map(({ id, icon: Icon }) => (
               <button
-                key={t}
+                key={id}
                 role="tab"
-                aria-selected={tab === t}
-                className={`tab${tab === t ? ' tab--active' : ''}`}
-                onClick={() => setTab(t)}
+                aria-selected={tab === id}
+                className={`tab${tab === id ? ' tab--active' : ''}`}
+                onClick={() => setTab(id)}
               >
-                {t}
+                <Icon aria-hidden="true" /> {id}
               </button>
             ))}
           </div>
@@ -173,7 +190,7 @@ export default function Editor() {
                   )}
                   <div className="avatarrow__actions">
                     <label className="btn btn--ghost avatarrow__upload">
-                      Upload image
+                      <FaUpload aria-hidden="true" /> Upload image
                       <input
                         type="file"
                         accept="image/png,image/jpeg,image/webp,image/gif"
@@ -183,7 +200,7 @@ export default function Editor() {
                     </label>
                     {profile.avatarUrl && (
                       <button className="btn btn--ghost" onClick={() => patch({ avatarUrl: '' })}>
-                        Remove
+                        <FaXmark aria-hidden="true" /> Remove
                       </button>
                     )}
                   </div>
@@ -217,13 +234,13 @@ export default function Editor() {
                       onClick={() => patch({ socials: profile.socials.filter((_, j) => j !== i) })}
                       aria-label="Remove social"
                     >
-                      ✕
+                      <FaXmark aria-hidden="true" />
                     </button>
                   </div>
                 ))}
                 <div>
                   <button className="btn btn--ghost" onClick={() => patch({ socials: [...profile.socials, ''] })}>
-                    + Add social
+                    <FaPlus aria-hidden="true" /> Add social
                   </button>
                 </div>
               </div>
@@ -236,7 +253,7 @@ export default function Editor() {
                 <div className={`linkcard${l.enabled ? '' : ' linkcard--off'}`} key={l.id ?? `new-${i}`}>
                   <div className="linkcard__reorder">
                     <button className="iconbtn" onClick={() => moveLink(i, -1)} disabled={i === 0} aria-label="Move up">
-                      ↑
+                      <FaArrowUp aria-hidden="true" />
                     </button>
                     <button
                       className="iconbtn"
@@ -244,7 +261,7 @@ export default function Editor() {
                       disabled={i === profile.links.length - 1}
                       aria-label="Move down"
                     >
-                      ↓
+                      <FaArrowDown aria-hidden="true" />
                     </button>
                   </div>
                   <div className="linkcard__fields">
@@ -288,7 +305,7 @@ export default function Editor() {
                       onClick={() => patch({ links: profile.links.filter((_, j) => j !== i) })}
                       aria-label={`Delete link ${i + 1}`}
                     >
-                      ✕
+                      <FaTrashCan aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -297,7 +314,7 @@ export default function Editor() {
                 className="btn btn--ghost"
                 onClick={() => patch({ links: [...profile.links, { label: '', url: '', icon: '', enabled: 1 }] })}
               >
-                + Add link
+                <FaPlus aria-hidden="true" /> Add link
               </button>
             </div>
           )}
@@ -356,7 +373,7 @@ export default function Editor() {
                       title="Theme default"
                       aria-label="Theme default background"
                     >
-                      ✕
+                      <FaXmark aria-hidden="true" />
                     </button>
                     {BG_PRESETS.map((c) => (
                       <button
@@ -388,7 +405,7 @@ export default function Editor() {
                     title="Theme default"
                     aria-label="Theme default button color"
                   >
-                    ✕
+                    <FaXmark aria-hidden="true" />
                   </button>
                   {ACCENT_PRESETS.map((c) => (
                     <button
@@ -408,7 +425,9 @@ export default function Editor() {
                     />
                   </label>
                 </div>
-                <p className="field__hint">✕ follows the theme. Custom colors keep text readable automatically.</p>
+                <p className="field__hint">
+                  The first swatch follows the theme. Custom colors keep text readable automatically.
+                </p>
               </div>
 
               <div className="field">

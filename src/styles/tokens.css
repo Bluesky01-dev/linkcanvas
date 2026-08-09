@@ -5,9 +5,12 @@
    ============================================================ */
 
 :root {
-  /* Type */
+  /* Type — one variable family, two optical sizes:
+     Inter (text) for body/subheadings, Inter Display for headings
+     via the 'opsz' axis (32 = the Display cut). */
   --font-body: 'Inter Variable', system-ui, -apple-system, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-display: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --opsz-display: 'opsz' 32;
 
   --text-xs: 0.75rem;
   --text-s: 0.875rem;
