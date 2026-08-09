@@ -13,11 +13,12 @@ app.get('/api/profile', (req, res) => {
 })
 
 const THEMES = ['cloud', 'sky', 'paper', 'midnight', 'aurora', 'prism']
+const BACKGROUNDS = ['art', 'solid']
 const STYLES = ['solid', 'soft', 'outline']
 const SHAPES = ['rounded', 'pill', 'square']
 
 app.put('/api/profile', (req, res) => {
-  const { name, bio, avatarUrl, theme, buttonStyle, shape, links, socials } = req.body ?? {}
+  const { name, bio, avatarUrl, theme, background, buttonStyle, shape, links, socials } = req.body ?? {}
   if (typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ error: 'Name is required.' })
   }
@@ -51,6 +52,7 @@ app.put('/api/profile', (req, res) => {
     bio: String(bio ?? '').trim(),
     avatarUrl: String(avatarUrl ?? '').trim(),
     theme: THEMES.includes(theme) ? theme : 'cloud',
+    background: BACKGROUNDS.includes(background) ? background : 'art',
     buttonStyle: STYLES.includes(buttonStyle) ? buttonStyle : 'solid',
     shape: SHAPES.includes(shape) ? shape : 'rounded',
     links: cleanLinks,

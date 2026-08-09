@@ -18,6 +18,7 @@ function load() {
         bio: s.bio,
         avatarUrl: s.avatarUrl,
         theme: s.theme,
+        background: s.background,
         buttonStyle: s.buttonStyle,
         shape: s.shape,
       },
@@ -39,15 +40,16 @@ export const store = {
   getProfile() {
     const d = load()
     return {
+      background: 'art', // default for pre-existing data files
       ...d.profile,
       links: d.links.map(({ id, label, url, icon, enabled }) => ({ id, label, url, icon, enabled })),
       socials: [...d.socials],
     }
   },
 
-  saveProfile({ name, bio, avatarUrl, theme, buttonStyle, shape, links, socials }) {
+  saveProfile({ name, bio, avatarUrl, theme, background, buttonStyle, shape, links, socials }) {
     const d = load()
-    d.profile = { name, bio, avatarUrl, theme, buttonStyle, shape }
+    d.profile = { name, bio, avatarUrl, theme, background, buttonStyle, shape }
     const existing = new Set(d.links.map((l) => l.id))
     d.links = links.map((l) => ({
       id: l.id != null && existing.has(l.id) ? l.id : d.nextId++,

@@ -6,6 +6,10 @@ import { SocialIcon, platformLabel } from '../lib/icons.jsx'
 import { api } from '../lib/api.js'
 
 const TABS = ['Profile', 'Links', 'Design']
+const BACKGROUNDS = [
+  { id: 'art', name: 'Animated' },
+  { id: 'solid', name: 'Solid' },
+]
 const STYLES = [
   { id: 'solid', name: 'Solid' },
   { id: 'soft', name: 'Soft' },
@@ -280,6 +284,23 @@ export default function Editor() {
                   ))}
                 </div>
                 <p className="field__hint">Prism paints the palette from your name — every name is different.</p>
+              </div>
+
+              <div className="field">
+                <label>Background</label>
+                <div className="seg">
+                  {BACKGROUNDS.map((b) => (
+                    <button
+                      key={b.id}
+                      className={`seg__opt${profile.background === b.id ? ' seg__opt--active' : ''}`}
+                      onClick={() => patch({ background: b.id })}
+                      aria-pressed={profile.background === b.id}
+                    >
+                      {b.name}
+                    </button>
+                  ))}
+                </div>
+                <p className="field__hint">Solid uses the theme's plain background color — no artwork.</p>
               </div>
 
               <div className="field">

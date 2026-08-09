@@ -32,7 +32,9 @@ export default function BioView({ profile, onLinkClick, preview = false, canvasS
       data-shape={profile.shape}
       data-btnstyle={profile.buttonStyle}
     >
-      <GenerativeCanvas seedText={seed} theme={theme} className="bio__canvas" />
+      {profile.background !== 'solid' && (
+        <GenerativeCanvas seedText={seed} theme={theme} className="bio__canvas" />
+      )}
 
       <div className="bio__card">
         {profile.avatarUrl ? (

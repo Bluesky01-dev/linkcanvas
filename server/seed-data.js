@@ -5,6 +5,7 @@ export const SAMPLE_PROFILE = {
   bio: 'Creative developer · building in public',
   avatarUrl: '',
   theme: 'cloud',
+  background: 'art',
   buttonStyle: 'solid',
   shape: 'rounded',
   links: [

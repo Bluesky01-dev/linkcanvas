@@ -17,6 +17,7 @@ db.exec(`
     bio TEXT NOT NULL DEFAULT '',
     avatar_url TEXT NOT NULL DEFAULT '',
     theme TEXT NOT NULL DEFAULT 'cloud',
+    background TEXT NOT NULL DEFAULT 'art',
     button_style TEXT NOT NULL DEFAULT 'solid',
     shape TEXT NOT NULL DEFAULT 'rounded'
   );
@@ -41,11 +42,18 @@ db.exec(`
   );
 `)
 
+// existing v2 databases: add the background column if it's missing
+try {
+  db.exec("ALTER TABLE profile ADD COLUMN background TEXT NOT NULL DEFAULT 'art'")
+} catch {
+  /* column already exists */
+}
+
 if (!db.prepare('SELECT id FROM profile WHERE id = 1').get()) {
   const s = SAMPLE_PROFILE
   db.prepare(
-    'INSERT INTO profile (id, name, bio, avatar_url, theme, button_style, shape) VALUES (1, ?, ?, ?, ?, ?, ?)'
-  ).run(s.name, s.bio, s.avatarUrl, s.theme, s.buttonStyle, s.shape)
+    'INSERT INTO profile (id, name, bio, avatar_url, theme, background, button_style, shape) VALUES (1, ?, ?, ?, ?, ?, ?, ?)'
+  ).run(s.name, s.bio, s.avatarUrl, s.theme, s.background, s.buttonStyle, s.shape)
   const il = db.prepare('INSERT INTO links (label, url, icon, enabled, position) VALUES (?, ?, ?, ?, ?)')
   s.links.forEach((l, i) => il.run(l.label, l.url, l.icon, l.enabled, i))
   const is = db.prepare('INSERT INTO socials (url, position) VALUES (?, ?)')
@@ -55,18 +63,20 @@ if (!db.prepare('SELECT id FROM profile WHERE id = 1').get()) {
 export const store = {
   getProfile() {
     const p = db
-      .prepare('SELECT name, bio, avatar_url avatarUrl, theme, button_style buttonStyle, shape FROM profile WHERE id = 1')
+      .prepare(
+        'SELECT name, bio, avatar_url avatarUrl, theme, background, button_style buttonStyle, shape FROM profile WHERE id = 1'
+      )
       .get()
     const links = db.prepare('SELECT id, label, url, icon, enabled FROM links ORDER BY position').all()
     const socials = db.prepare('SELECT url FROM socials ORDER BY position').all().map((r) => r.url)
     return { ...p, links, socials }
   },
 
-  saveProfile({ name, bio, avatarUrl, theme, buttonStyle, shape, links, socials }) {
+  saveProfile({ name, bio, avatarUrl, theme, background, buttonStyle, shape, links, socials }) {
     const tx = db.transaction(() => {
       db.prepare(
-        'UPDATE profile SET name = ?, bio = ?, avatar_url = ?, theme = ?, button_style = ?, shape = ? WHERE id = 1'
-      ).run(name, bio, avatarUrl, theme, buttonStyle, shape)
+        'UPDATE profile SET name = ?, bio = ?, avatar_url = ?, theme = ?, background = ?, button_style = ?, shape = ? WHERE id = 1'
+      ).run(name, bio, avatarUrl, theme, background, buttonStyle, shape)
 
       const keep = links.filter((l) => l.id != null).map((l) => l.id)
       const existing = db.prepare('SELECT id FROM links').all().map((r) => r.id)
